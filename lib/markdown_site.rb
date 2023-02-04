@@ -1,0 +1,1 @@
+Dir[File.dirname(__FILE__) + '/markdown_site/**/*.rb'].each {|file| require file }
