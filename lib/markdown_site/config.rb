@@ -114,6 +114,14 @@ module MarkdownSite
 
         def journals_template
             return get_template_info("journals_template")
-        end        
+        end
+
+        def root_template
+            return get_template_info("root_template")
+        end
+
+        def index_template
+            return get_template_info("index_template")
+        end
     end
 end

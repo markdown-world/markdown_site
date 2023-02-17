@@ -4,7 +4,7 @@ require "markdown_extension"
 
 module MarkdownSite
     class Site
-        attr_accessor :config, :pages, :journals, :references, :reverse_references
+        attr_accessor :config, :pages_path, :pages, :journals, :references, :reverse_references
         attr_accessor :nodes, :links, :citations, :languages
     
         def initialize(config, type)
@@ -60,16 +60,37 @@ module MarkdownSite
         def init_pages_by_lang(lang=nil)
             pages = []
             files = Dir.glob(@pages_path + lang.to_s + "/**/*.md")
+            files.sort! do |a,b|
+                folder_file_comparison(a,b)
+            end
             files.each do |file|
                 unless file == @pages_path + lang.to_s + "/summary.md"
                     unless file.index("hls_")
-                        page = MarkdownExtension::Page.new(file, self)
+                        page = MarkdownExtension::Page.new(file, self, lang)
                         pages << page
                         gen_references(page.item_name , page.markdown)
                     end
                 end
             end
             return pages
+        end
+
+        def folder_file_comparison(a,b)
+            a_array = a.split("/")
+            b_array = b.split("/")
+            if a_array.length == 1
+                if b_array.length == 1
+                    return a<=>b
+                else
+                    return 1
+                end
+            else
+                if a_array[0]==b_array[0]
+                    return folder_file_comparison(a_array[1..-1].join("/"),b_array[1..-1].join("/"))
+                else
+                    return a_array[0]<=>b_array[0]
+                end
+            end
         end
 
         def pages(lang=nil)
@@ -211,6 +232,11 @@ module MarkdownSite
         end
 
         def generate_index
+            if @languages
+                template = MarkdownSite::RootTemplate.new(self)
+                template.generate()
+            else
+            end
         end
 
         def generate_pages
