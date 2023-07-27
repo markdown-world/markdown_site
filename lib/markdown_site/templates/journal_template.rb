@@ -19,7 +19,7 @@ module MarkdownSite
                 if page_number == page_count        
                     f.puts(template.render('config'=>{'title'=>@site_config.title}, 'journal_list'=>journal_list[page_start..-1], 'pagination'=>pagination))
                 else
-                    f.puts(template.render('config'=>{'title'=>@site_config.title}, 'journal_list'=>journal_list[page_start..page_start+20], 'pagination'=>pagination))
+                    f.puts(template.render('config'=>{'title'=>@site_config.title}, 'journal_list'=>journal_list[page_start..page_start+19], 'pagination'=>pagination))
                 end
                 f.close
             end
