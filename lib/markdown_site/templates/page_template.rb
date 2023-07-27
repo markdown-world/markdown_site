@@ -21,9 +21,10 @@ module MarkdownSite
         end
 
         def get_summary_html(lang=nil, dir=nil)
+            return nil if @site_config.type == :logseq
             if @summary_page[lang] == nil
                 temp_file = false
-                path = @site.pages_path+"/"+lang+"summary.md"
+                path = @site.pages_path+"/"+lang.to_s+"summary.md"
                 unless File.exist?(path)
                     temp_file = true
                     f = File.new(path, 'w')
@@ -83,21 +84,38 @@ module MarkdownSite
                 f.close
             end
             template = Liquid::Template.parse(File.read(@site_config.page_template))
-            default_lang = @site_config.languages.first[1]
+            unless lang
+                if @site_config.languages
+                    default_lang = @site_config.languages.first[1]
+                else
+                    default_lang = nil
+                end
+            else
+                default_lang = @site_config.languages[lang[0..-2]]
+            end            
             site_pages.each do |page|
                 if page.path.include?("/")
                     dir = "#{@site_config.publish_dir}/#{lang}#{page.path.split("/")[0..-2].join("/")}"
                     FileUtils.mkdir_p(dir)
                 end
                 filename = "#{@site_config.publish_dir}/#{lang}#{page.path}.html"
+                if @site.languages
+                    languages = []
+                    @site.languages.each do |k, v|
+                        languages << {"path"=> "../" * (filename.split("/").size-3) + k, "title"=>v}
+                    end
+                end
+                kg_url = "../" * (filename.split("/").size-3) + "kg.html"
                 f = File.new(filename, "w")
                 f.puts template.render(
                     'config'=>{'title'=>@site_config.title},
+                    'kg_url' => kg_url,
                     'default_lang'=>default_lang,
-                    'languages' => @site.languages,
+                    'languages' => languages,
                     'summary_html' => get_summary_html(lang, page.path.split("/")[0..-2].join("/")),
                     'page_title' => page.item_name,
-                    'page_html' => page.html)
+                    'page_html' => page.html,
+                    'meta_html' => page.meta_html)
                 f.close
             end
         end

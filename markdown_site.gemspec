@@ -12,6 +12,6 @@ Gem::Specification.new do |s|
   s.require_path = 'lib'
   s.required_ruby_version = '>= 2.5.0'
   s.add_runtime_dependency 'tomlrb', '~>2.0.0'
-  s.add_runtime_dependency 'markdown_extension', '~>0.1.6'
+  s.add_runtime_dependency 'markdown_extension', '~>0.1.9'
   s.add_runtime_dependency 'liquid', '~>5.4.0'
 end
